@@ -1,0 +1,148 @@
+{
+  "images": 20,
+  "summary": {
+    "PhoenixCarve": {
+      "exact": 200,
+      "partial": 20,
+      "missed": 0,
+      "fp": 0,
+      "carved": 220,
+      "truth": 220,
+      "damaged_flagged": 40,
+      "damaged_total": 40,
+      "precision": 0.9091,
+      "recall": 0.9091,
+      "f1": 0.9091,
+      "damage_detection": 1.0,
+      "seconds": 0.083
+    },
+    "Foremost": {
+      "exact": 160,
+      "partial": 20,
+      "missed": 40,
+      "fp": 0,
+      "carved": 180,
+      "truth": 220,
+      "damaged_flagged": 0,
+      "damaged_total": 40,
+      "precision": 0.8889,
+      "recall": 0.7273,
+      "f1": 0.8,
+      "damage_detection": 0.0,
+      "seconds": 0.191
+    },
+    "Scalpel": {
+      "exact": 100,
+      "partial": 120,
+      "missed": 0,
+      "fp": 143,
+      "carved": 363,
+      "truth": 220,
+      "damaged_flagged": 0,
+      "damaged_total": 40,
+      "precision": 0.2755,
+      "recall": 0.4545,
+      "f1": 0.3431,
+      "damage_detection": 0.0,
+      "seconds": 0.108
+    }
+  },
+  "by_alignment": {
+    "PhoenixCarve": {
+      "unaligned": {
+        "exact": 100,
+        "partial": 10,
+        "missed": 0,
+        "fp": 0,
+        "carved": 110,
+        "truth": 110,
+        "damaged_flagged": 20,
+        "damaged_total": 20,
+        "precision": 0.9091,
+        "recall": 0.9091,
+        "f1": 0.9091,
+        "damage_detection": 1.0,
+        "seconds": 0.041
+      },
+      "aligned": {
+        "exact": 100,
+        "partial": 10,
+        "missed": 0,
+        "fp": 0,
+        "carved": 110,
+        "truth": 110,
+        "damaged_flagged": 20,
+        "damaged_total": 20,
+        "precision": 0.9091,
+        "recall": 0.9091,
+        "f1": 0.9091,
+        "damage_detection": 1.0,
+        "seconds": 0.041
+      }
+    },
+    "Foremost": {
+      "unaligned": {
+        "exact": 80,
+        "partial": 10,
+        "missed": 20,
+        "fp": 0,
+        "carved": 90,
+        "truth": 110,
+        "damaged_flagged": 0,
+        "damaged_total": 20,
+        "precision": 0.8889,
+        "recall": 0.7273,
+        "f1": 0.8,
+        "damage_detection": 0.0,
+        "seconds": 0.089
+      },
+      "aligned": {
+        "exact": 80,
+        "partial": 10,
+        "missed": 20,
+        "fp": 0,
+        "carved": 90,
+        "truth": 110,
+        "damaged_flagged": 0,
+        "damaged_total": 20,
+        "precision": 0.8889,
+        "recall": 0.7273,
+        "f1": 0.8,
+        "damage_detection": 0.0,
+        "seconds": 0.102
+      }
+    },
+    "Scalpel": {
+      "unaligned": {
+        "exact": 50,
+        "partial": 60,
+        "missed": 0,
+        "fp": 73,
+        "carved": 183,
+        "truth": 110,
+        "damaged_flagged": 0,
+        "damaged_total": 20,
+        "precision": 0.2732,
+        "recall": 0.4545,
+        "f1": 0.3413,
+        "damage_detection": 0.0,
+        "seconds": 0.053
+      },
+      "aligned": {
+        "exact": 50,
+        "partial": 60,
+        "missed": 0,
+        "fp": 70,
+        "carved": 180,
+        "truth": 110,
+        "damaged_flagged": 0,
+        "damaged_total": 20,
+        "precision": 0.2778,
+        "recall": 0.4545,
+        "f1": 0.3448,
+        "damage_detection": 0.0,
+        "seconds": 0.055
+      }
+    }
+  }
+}

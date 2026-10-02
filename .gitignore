@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+cases/
+out/
+*.dd
+*_truth.json
+ground_truth.json
+hidden_regions.json
+.DS_Store
+.venv/

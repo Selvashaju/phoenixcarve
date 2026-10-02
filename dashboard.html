@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhoenixCarve</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ash:#262321; --ash-2:#2f2b28; --ash-3:#3a3532; --bone:#e9e3d7; --muted:#9c948a;
+  --ember:#e2552e; --amber:#d9a441; --slate:#5d7e99;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ash);color:var(--bone);font:15px/1.5 var(--sans)}
+main{max-width:1120px;margin:0 auto;padding:40px 24px 64px}
+h1{font-size:44px;line-height:1;margin:0 0 8px;font-weight:700;letter-spacing:-.02em}
+h2{font-size:18px;margin:0 0 14px;font-weight:600}
+.lede{color:var(--muted);margin:0;max-width:64ch}
+.layout{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:40px;margin-top:36px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+form{background:var(--ash-2);border-radius:4px;padding:20px}
+label{display:block;font-size:13px;color:var(--muted);margin:0 0 4px}
+input[type=text]{width:100%;background:var(--ash);color:var(--bone);border:1px solid var(--ash-3);border-radius:3px;
+  padding:9px 10px;font:14px var(--sans);margin-bottom:14px}
+input[name=case_no]{font-family:var(--mono)}
+.drop{display:block;border:1.5px dashed var(--ash-3);border-radius:4px;padding:22px 14px;text-align:center;cursor:pointer;
+  margin-bottom:16px;color:var(--muted)}
+.drop:hover,.drop.over{border-color:var(--amber);color:var(--bone)}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.drop strong{display:block;color:var(--bone);font-weight:500;word-break:break-all}
+button,.btn{background:var(--ash-3);color:var(--bone);border:0;border-radius:3px;padding:8px 13px;font:14px var(--sans);
+  cursor:pointer;text-decoration:none;display:inline-block}
+button.primary{background:var(--amber);color:#2a1d08;font-weight:600;width:100%;padding:11px}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible,.btn:focus-visible,input:focus-visible,.drop:focus-within{outline:2px solid var(--amber);outline-offset:2px}
+.msg{font-size:13px;margin-top:10px;min-height:20px}
+.msg.err{color:var(--ember)}
+.bar{height:4px;background:var(--ash-3);border-radius:2px;margin-top:10px;overflow:hidden;display:none}
+.bar i{display:block;height:100%;width:0;background:var(--amber);transition:width .2s}
+.case{padding:18px 0;border-top:1px solid var(--ash-3)}
+.case:last-child{border-bottom:1px solid var(--ash-3)}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.cno{font:600 16px var(--mono)}
+.sub{color:var(--muted);font-size:13px}
+.stages{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:12px 0 6px}
+.stages span{height:4px;border-radius:2px;background:var(--ash-3)}
+.stages span.on{background:var(--amber)}
+.stages span.now{background:var(--amber);animation:pulse 1s ease-in-out infinite alternate}
+@media (prefers-reduced-motion:reduce){.stages span.now{animation:none}}
+@keyframes pulse{to{opacity:.35}}
+.facts{margin:10px 0 12px;font-size:15px}
+.facts b{color:var(--amber);font-weight:500}.facts .warn{color:var(--ember)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions .del{background:none;color:var(--muted);margin-left:auto}
+.actions .del:hover{color:var(--ember)}
+.err{color:var(--ember)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:12px}
+th,td{text-align:left;padding:5px 6px;border-bottom:1px solid var(--ash-3);vertical-align:top}
+th{color:var(--muted);font-weight:500}
+td.h{font-family:var(--mono);color:var(--muted)}
+.chain{overflow-x:auto}
+.intact{color:var(--amber)}.broken{color:var(--ember)}
+.empty{color:var(--muted);padding:18px 0;border-top:1px solid var(--ash-3)}
+</style></head>
+<body><main>
+<h1>PhoenixCarve</h1>
+<p class="lede">Upload a raw disk image. Each case is hashed, carved, validated, entropy-mapped and written up as a signed PDF report, with every step recorded in a tamper-evident custody log.</p>
+
+<div class="layout">
+  <section>
+    <h2>New case</h2>
+    <form id="f">
+      <label for="case_no">Case number</label>
+      <input type="text" id="case_no" name="case_no" required pattern="[A-Za-z0-9_\-]{3,40}" placeholder="PC-2026-001">
+      <label for="examiner">Examiner</label>
+      <input type="text" id="examiner" name="examiner" required placeholder="Full name">
+      <label for="org">Organisation</label>
+      <input type="text" id="org" name="org" placeholder="Optional">
+      <label for="purpose">Purpose of examination</label>
+      <input type="text" id="purpose" name="purpose" placeholder="Optional">
+      <label class="drop" id="drop">
+        <input type="file" id="image" name="image" required accept=".dd,.img,.raw,.bin,.001,.iso">
+        <strong id="fname">Choose a disk image</strong>
+        <span id="fhint">or drop it here (.dd, .img, .raw)</span>
+      </label>
+      <button class="primary" id="go" type="submit">Start analysis</button>
+      <div class="bar" id="bar"><i></i></div>
+      <div class="msg" id="msg" role="status"></div>
+    </form>
+  </section>
+
+  <section>
+    <h2>Cases</h2>
+    <div id="cases"><p class="empty">No cases yet. Start one with a disk image.</p></div>
+  </section>
+</div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const STAGES = ["hashing","carving","entropy","reporting","done"];
+const human = n => n<1024?n+" B":n<1048576?(n/1024).toFixed(1)+" KB":n<1073741824?(n/1048576).toFixed(1)+" MB":(n/1073741824).toFixed(2)+" GB";
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const open_ = new Set();
+
+// ---- file picker / drop ----
+const drop=$("drop"), inp=$("image");
+function picked(){ const f=inp.files[0]; $("fname").textContent=f?f.name:"Choose a disk image"; $("fhint").textContent=f?human(f.size):"or drop it here (.dd, .img, .raw)"; }
+inp.addEventListener("change",picked);
+["dragover","dragenter"].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(e=>drop.addEventListener(e,()=>drop.classList.remove("over")));
+drop.addEventListener("drop",ev=>{ev.preventDefault(); inp.files=ev.dataTransfer.files; picked();});
+
+// ---- upload with progress ----
+$("f").addEventListener("submit",ev=>{
+  ev.preventDefault();
+  const fd=new FormData($("f")), xhr=new XMLHttpRequest(), bar=$("bar"), msg=$("msg");
+  $("go").disabled=true; bar.style.display="block"; msg.className="msg"; msg.textContent="Uploading evidence";
+  xhr.upload.onprogress=e=>{ if(e.lengthComputable) bar.firstChild.style.width=(e.loaded/e.total*100)+"%"; };
+  xhr.onload=()=>{
+    $("go").disabled=false; bar.style.display="none"; bar.firstChild.style.width="0";
+    if(xhr.status===202){ msg.textContent="Case created. Analysis is running."; $("f").reset(); picked(); refresh(); }
+    else { let d; try{d=JSON.parse(xhr.responseText).detail}catch{d=xhr.statusText}
+      msg.className="msg err"; msg.textContent=typeof d==="string"?d:"Upload failed. Check the form and try again."; }
+  };
+  xhr.onerror=()=>{ $("go").disabled=false; msg.className="msg err"; msg.textContent="Server not reachable. Is uvicorn running?"; };
+  xhr.open("POST","/api/cases"); xhr.send(fd);
+});
+
+// ---- cases ----
+async function detail(c){ return (await fetch(`/api/cases/${c}`)).json(); }
+async function chain(c, el){
+  const d=await (await fetch(`/api/cases/${c}/custody`)).json();
+  el.innerHTML=`<p class="${d.intact?"intact":"broken"}">${d.intact?"Chain intact. Every entry still matches its hash.":"Chain broken: "+esc(d.message)}</p>
+   <div class="chain"><table><tr><th>#</th><th>Time UTC</th><th>Action</th><th>Detail</th><th>Entry hash</th></tr>
+   ${d.entries.map(e=>`<tr><td>${e.seq}</td><td style="white-space:nowrap">${esc(e.time_utc.slice(11,19))}</td><td style="white-space:nowrap">${esc(e.action.replaceAll("_"," "))}</td><td>${esc(e.detail.length>44?e.detail.slice(0,44)+"...":e.detail)}</td><td class="h">${e.entry_hash.slice(0,12)}</td></tr>`).join("")}
+   </table></div>`;
+}
+async function render(list){
+  const box=$("cases");
+  if(!list.length){ box.innerHTML='<p class="empty">No cases yet. Start one with a disk image.</p>'; return; }
+  const html=await Promise.all(list.map(async s=>{
+    const idx=STAGES.indexOf(s.stage);
+    const bars=STAGES.map((_,i)=>`<span class="${s.state==="done"||i<idx?"on":i===idx?"now":""}"></span>`).join("");
+    let body="";
+    if(s.state==="running") body=`<div class="stages" aria-label="Progress: ${esc(s.stage)}">${bars}</div><div class="sub">${esc(s.stage[0].toUpperCase()+s.stage.slice(1))}</div>`;
+    else if(s.state==="failed") body=`<p class="err">Analysis failed: ${esc(s.error)}</p>`;
+    else {
+      const d=await detail(s.case_no), v=d.validation||{}, u=(d.unexplained||[]).length;
+      body=`<p class="facts"><b>${d.carved.length} files</b> recovered${v.corrupt?`, <span class="warn">${v.corrupt} damaged</span>`:""}${u?`, <span class="warn">${u} suspicious region${u>1?"s":""}</span>`:""}. Evidence ${d.evidence_hash.integrity_preserved?"unchanged":'<span class="warn">CHANGED</span>'}.</p>
+      <div class="actions">
+        <a class="btn" href="/api/cases/${s.case_no}/map" target="_blank" rel="noopener">Open evidence map</a>
+        <a class="btn" href="/api/cases/${s.case_no}/report">Download report</a>
+        <button data-chain="${s.case_no}" aria-expanded="${open_.has(s.case_no)}">Custody log</button>
+        <button class="del" data-del="${s.case_no}">Delete case</button>
+      </div><div id="ch-${s.case_no}"></div>`;
+    }
+    return `<article class="case"><div class="top"><span class="cno">${esc(s.case_no)}</span><span class="sub">${esc(s.created_utc?.replace("T"," ").replace("+00:00"," UTC"))}</span></div>
+      <div class="sub">${esc(s.evidence)}, ${human(s.size)}. Examiner ${esc(s.examiner)}</div>${body}</article>`;
+  }));
+  box.innerHTML=html.join("");
+  for(const c of open_){ const el=$("ch-"+c); if(el) chain(c,el); }
+}
+$("cases").addEventListener("click",async ev=>{
+  const t=ev.target;
+  if(t.dataset.chain){ const c=t.dataset.chain, el=$("ch-"+c);
+    if(open_.has(c)){ open_.delete(c); el.innerHTML=""; t.setAttribute("aria-expanded","false"); }
+    else { open_.add(c); t.setAttribute("aria-expanded","true"); chain(c,el); } }
+  if(t.dataset.del && confirm(`Delete case ${t.dataset.del} and its evidence copy? This cannot be undone.`)){
+    await fetch(`/api/cases/${t.dataset.del}`,{method:"DELETE"}); open_.delete(t.dataset.del); refresh(); }
+});
+let timer;
+async function refresh(){
+  clearTimeout(timer);
+  try{ const list=await (await fetch("/api/cases")).json(); await render(list);
+    if(list.some(s=>s.state==="running")) timer=setTimeout(refresh,1200); }
+  catch{ $("cases").innerHTML='<p class="empty err">Cannot reach the server. Start it with: uvicorn server:app --reload</p>'; }
+}
+refresh();
+</script></body></html>
